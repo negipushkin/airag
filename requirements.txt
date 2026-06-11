@@ -1,0 +1,25 @@
+# Core
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+python-multipart>=0.0.12
+
+# LLM + retrieval stack (TDD Option A, OpenAI for all LLM calls)
+openai>=1.55
+pinecone>=5.0
+tiktoken>=0.8
+
+# Document parsing (TDD Stage 1)
+pymupdf>=1.24
+pdfplumber>=0.11
+python-docx>=1.1
+
+# Testing
+pytest>=8.3
+httpx>=0.27
+
+# Optional extras (install as needed):
+#   cohere>=5.13              -> Cohere Rerank v3 (preferred reranker)
+#   sentence-transformers>=3  -> local cross-encoder reranker fallback
+#   ragas>=0.2 datasets>=3    -> RAGAS evaluation harness
