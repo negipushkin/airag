@@ -77,9 +77,7 @@ class PineconeDocumentRegistry:
     def _zero_dense(self) -> list[float]:
         from app.config import get_settings
         dims = get_settings().embedding_dimensions
-        v = [0.0] * dims
-        v[0] = 1e-9  # Pinecone rejects all-zero dense vectors
-        return v
+        return [0.001] + [0.0] * (dims - 1)
 
     def add(self, info: DocumentInfo) -> None:
         self._index.upsert(
