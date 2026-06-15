@@ -40,6 +40,8 @@ async def ingest(file: UploadFile, doc_type: str = "document") -> IngestResponse
         info = get_pipeline().ingest(data, file.filename or "upload", doc_type=doc_type)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
     return IngestResponse(document=info)
 
 
