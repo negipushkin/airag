@@ -36,7 +36,7 @@ class QueryTransformer:
     def __init__(self, client: OpenAI | None = None) -> None:
         s = get_settings()
         self._settings = s
-        self._client = client or OpenAI(api_key=s.openai_api_key, max_retries=3)
+        self._client = client or OpenAI(api_key=s.openai_api_key, max_retries=1, timeout=8.0)
         self._model = s.transform_model
 
     # ------------------------------------------------------- 4a decomposition

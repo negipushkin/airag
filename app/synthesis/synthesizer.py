@@ -36,7 +36,7 @@ omit the claim."""
 class AnswerSynthesizer:
     def __init__(self, client: OpenAI | None = None) -> None:
         s = get_settings()
-        self._client = client or OpenAI(api_key=s.openai_api_key, max_retries=3)
+        self._client = client or OpenAI(api_key=s.openai_api_key, max_retries=1, timeout=8.0)
         self._model = s.synthesis_model
 
     def synthesize(

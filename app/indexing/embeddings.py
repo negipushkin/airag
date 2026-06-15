@@ -12,7 +12,7 @@ _BATCH_SIZE = 96
 class EmbeddingService:
     def __init__(self) -> None:
         s = get_settings()
-        self._client = OpenAI(api_key=s.openai_api_key, max_retries=3)
+        self._client = OpenAI(api_key=s.openai_api_key, max_retries=1, timeout=8.0)
         self._model = s.embedding_model
         self._dimensions = s.embedding_dimensions
 
