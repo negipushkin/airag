@@ -155,17 +155,20 @@ class Pipeline:
         answer, usage = self.synthesizer.synthesize(req.query, context_block)
         validation = self.validator.validate(answer, top_chunks)
 
-        if validation.status == "rerun":
-            # Hallucinated citation: do NOT return; re-run once with stricter prompt.
+        if validation.status in ("rerun", "uncited_claims"):
+            # Hallucinated citation or uncited claims: re-run once with stricter prompt.
             logger.warning(
-                "Hallucinated citations %s; re-running with strict prompt",
+                "Validation issue (%s) — re-running with strict prompt. "
+                "Hallucinated: %s  Uncited sentences: %d",
+                validation.status,
                 validation.hallucinated_files,
+                len(validation.uncited_sentences),
             )
             answer, usage = self.synthesizer.synthesize(
                 req.query, context_block, strict=True
             )
             revalidation = self.validator.validate(answer, top_chunks)
-            status = "rerun" if revalidation.status == "rerun" else revalidation.status
+            status = revalidation.status if revalidation.status != "rerun" else "rerun"
             if revalidation.status == "rerun":
                 answer = (
                     "INSUFFICIENT_CONTEXT: The answer could not be reliably "
