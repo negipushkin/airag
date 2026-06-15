@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowledgeOS — UI Design Spec</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: #1A1A1A; background: #fff; line-height: 1.6; }
+
+.page { max-width: 900px; margin: 0 auto; padding: 48px 32px; }
+
+.cover { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 2px solid #1A6B3C; }
+.cover-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1A6B3C; margin-bottom: 12px; }
+.cover h1 { font-size: 32px; font-weight: 600; color: #0D2137; margin-bottom: 8px; line-height: 1.2; }
+.cover-sub { font-size: 16px; color: #666; margin-bottom: 24px; }
+.cover-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.meta-item { background: #F5F5F5; border-radius: 8px; padding: 12px 16px; }
+.meta-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.meta-value { font-size: 14px; font-weight: 500; color: #1A1A1A; }
+
+.section { margin-bottom: 48px; }
+.section-title { font-size: 20px; font-weight: 600; color: #0D2137; margin-bottom: 6px; padding-bottom: 8px; border-bottom: 1px solid #E5E5E5; }
+.section-sub { font-size: 13px; color: #666; margin-bottom: 20px; }
+
+h3 { font-size: 15px; font-weight: 600; color: #1A1A1A; margin: 24px 0 10px; }
+p { font-size: 13px; color: #444; margin-bottom: 10px; line-height: 1.6; }
+ul { padding-left: 20px; margin-bottom: 10px; }
+li { font-size: 13px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+li strong { color: #1A1A1A; }
+code { font-family: 'Courier New', monospace; font-size: 12px; background: #F0F4F8; padding: 1px 5px; border-radius: 3px; color: #1A3A5C; }
+
+.callout { background: #D6EDDF; border-left: 3px solid #1A6B3C; border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 16px 0; }
+.callout-label { font-size: 11px; font-weight: 600; color: #1A6B3C; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.callout p { color: #1A3A2A; margin: 0; }
+
+.callout.amber { background: #FDF3DC; border-color: #EF9F27; }
+.callout.amber .callout-label { color: #854F0B; }
+.callout.amber p { color: #3A2A00; }
+
+.callout.blue { background: #E6F1FB; border-color: #185FA5; }
+.callout.blue .callout-label { color: #185FA5; }
+.callout.blue p { color: #0D2137; }
+
+.layout-diagram { border: 1px solid #E5E5E5; border-radius: 10px; overflow: hidden; margin: 16px 0; }
+.layout-diagram-header { background: #F5F5F5; padding: 8px 14px; font-size: 11px; color: #888; border-bottom: 1px solid #E5E5E5; }
+.layout-grid { display: grid; grid-template-columns: 220px 1fr; height: 300px; }
+.layout-sidebar { background: #F9F9F9; border-right: 1px solid #E5E5E5; padding: 12px; }
+.layout-main { display: grid; grid-template-rows: 48px 1fr 40px 60px; }
+.layout-zone { padding: 8px 12px; font-size: 11px; color: #888; border-bottom: 1px dashed #E5E5E5; display: flex; align-items: center; gap: 6px; }
+.layout-zone:last-child { border-bottom: none; }
+.zone-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+.z-toolbar { background: #E6F1FB; color: #185FA5; }
+.z-chat { background: #EAF3DE; color: #1A6B3C; }
+.z-filter { background: #FDF3DC; color: #854F0B; }
+.z-input { background: #FDEAEA; color: #A32D2D; }
+.z-sidebar { background: #F1EFE8; color: #5F5E5A; }
+
+.component-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.component-card { border: 1px solid #E5E5E5; border-radius: 8px; padding: 14px; }
+.component-name { font-size: 13px; font-weight: 600; color: #0D2137; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.component-badge { font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+.badge-required { background: #FDEAEA; color: #A32D2D; }
+.badge-optional { background: #FDF3DC; color: #854F0B; }
+.component-card ul { margin: 0; padding-left: 16px; }
+.component-card li { font-size: 12px; color: #555; }
+
+.color-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+.color-swatch { border-radius: 6px; overflow: hidden; border: 1px solid #E5E5E5; }
+.swatch-fill { height: 32px; }
+.swatch-meta { padding: 6px 8px; background: #fff; }
+.swatch-name { font-size: 11px; font-weight: 600; color: #1A1A1A; }
+.swatch-use { font-size: 10px; color: #888; }
+
+.spec-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+.spec-table th { background: #F5F5F5; text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #E5E5E5; }
+.spec-table td { padding: 8px 10px; border-bottom: 1px solid #F0F0F0; vertical-align: top; }
+.spec-table tr:last-child td { border-bottom: none; }
+.spec-table td:first-child { font-weight: 500; color: #1A1A1A; white-space: nowrap; }
+.spec-table td:last-child { color: #555; }
+
+.mockup-frame { border: 1px solid #E5E5E5; border-radius: 10px; overflow: hidden; margin: 16px 0; background: #fff; }
+.mockup-titlebar { background: #F5F5F5; padding: 8px 14px; font-size: 11px; color: #888; border-bottom: 1px solid #E5E5E5; display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-r { background: #FF6B6B; }
+.dot-y { background: #FFD93D; }
+.dot-g { background: #6BCB77; }
+.mockup-body { display: grid; grid-template-columns: 220px 1fr; height: 420px; }
+
+.sb { background: #F9F9F9; border-right: 1px solid #E5E5E5; padding: 0; display: flex; flex-direction: column; }
+.sb-head { padding: 12px 14px 10px; border-bottom: 1px solid #E5E5E5; }
+.sb-logo { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.sb-dot { width: 7px; height: 7px; border-radius: 50%; background: #1A6B3C; }
+.sb-title { font-size: 14px; font-weight: 600; color: #0D2137; }
+.sb-ver { font-size: 10px; color: #999; margin-left: auto; }
+.sb-upload { width: 100%; padding: 6px 10px; border: 1px dashed #CCC; border-radius: 6px; background: transparent; font-size: 12px; color: #888; cursor: default; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sb-section-label { padding: 8px 14px 4px; font-size: 10px; font-weight: 600; color: #999; letter-spacing: 0.05em; text-transform: uppercase; }
+.sb-docs { flex: 1; padding: 0 6px; overflow: hidden; }
+.sb-doc { display: flex; align-items: flex-start; gap: 7px; padding: 7px 8px; border-radius: 6px; margin-bottom: 2px; }
+.sb-doc.active { background: #fff; border: 1px solid #E0E0E0; }
+.sb-doc-icon { width: 24px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.sb-doc-icon.pdf { background: #FDEAEA; color: #A32D2D; }
+.sb-doc-icon.docx { background: #E6F1FB; color: #185FA5; }
+.sb-doc-icon.txt { background: #EAF3DE; color: #1A6B3C; }
+.sb-doc-meta { flex: 1; min-width: 0; }
+.sb-doc-name { font-size: 11px; font-weight: 500; color: #1A1A1A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-doc-info { font-size: 10px; color: #999; margin-top: 1px; }
+.sb-doc-chunk { display: inline-block; background: #EAF3DE; color: #1A6B3C; font-size: 9px; padding: 1px 5px; border-radius: 8px; margin-top: 2px; font-weight: 600; }
+.sb-stats { padding: 8px 10px; border-top: 1px solid #E5E5E5; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.sb-stat { background: #fff; border-radius: 5px; padding: 5px 7px; border: 1px solid #EFEFEF; }
+.sb-stat-v { font-size: 13px; font-weight: 600; color: #1A1A1A; }
+.sb-stat-l { font-size: 9px; color: #999; }
+
+.main-area { display: flex; flex-direction: column; }
+.m-toolbar { padding: 9px 14px; border-bottom: 1px solid #E5E5E5; display: flex; align-items: center; gap: 8px; background: #fff; }
+.m-toolbar-title { font-size: 13px; font-weight: 600; flex: 1; color: #1A1A1A; }
+.m-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #D6EDDF; color: #1A6B3C; font-weight: 600; }
+.m-icon-btn { width: 24px; height: 24px; border-radius: 5px; border: 1px solid #E5E5E5; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #888; cursor: default; }
+
+.m-chat { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.user-msg { display: flex; justify-content: flex-end; }
+.user-bubble { background: #1A6B3C; color: #fff; padding: 8px 12px; border-radius: 10px 10px 3px 10px; font-size: 12px; line-height: 1.5; max-width: 70%; }
+.asst-msg { display: flex; gap: 8px; }
+.asst-av { width: 24px; height: 24px; border-radius: 50%; background: #D6EDDF; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.asst-body { flex: 1; }
+.answer-box { border: 1px solid #E5E5E5; border-radius: 8px; overflow: hidden; }
+.ans-text { padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #1A1A1A; }
+.cite-tag { display: inline-flex; align-items: center; background: #E6F1FB; color: #185FA5; font-size: 10px; padding: 1px 5px; border-radius: 3px; margin: 0 1px; font-weight: 600; }
+.ans-sources { background: #F9F9F9; border-top: 1px solid #E5E5E5; padding: 6px 10px; }
+.src-header { font-size: 10px; color: #888; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+.src-valid { font-size: 10px; color: #1A6B3C; font-weight: 600; }
+.src-cards { display: flex; flex-direction: column; gap: 4px; }
+.src-card { background: #fff; border: 1px solid #E5E5E5; border-radius: 5px; padding: 5px 8px; }
+.src-card-top { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+.src-num { width: 14px; height: 14px; border-radius: 3px; background: #185FA5; color: #fff; font-size: 9px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+.src-name { font-size: 11px; font-weight: 500; color: #1A1A1A; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.src-score { font-size: 10px; padding: 1px 5px; border-radius: 8px; font-weight: 600; }
+.src-score.hi { background: #D6EDDF; color: #1A6B3C; }
+.src-score.md { background: #FDF3DC; color: #854F0B; }
+.src-page { font-size: 10px; color: #999; }
+.src-excerpt { font-size: 11px; color: #666; line-height: 1.4; margin-top: 2px; }
+.pipeline-row { background: #F9F9F9; border-top: 1px solid #E5E5E5; padding: 5px 10px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.p-label { font-size: 10px; color: #999; }
+.p-pill { font-size: 10px; padding: 1px 6px; border-radius: 8px; border: 1px solid #9FE1CB; background: #E1F5EE; color: #0F6E56; font-weight: 500; }
+.p-arrow { font-size: 9px; color: #CCC; }
+.p-ms { font-size: 10px; color: #999; margin-left: auto; }
+.ragas-row { background: #F9F9F9; border-top: 1px solid #E5E5E5; padding: 4px 10px; display: flex; gap: 10px; align-items: center; }
+.rg-label { font-size: 9px; color: #999; margin-right: 4px; }
+.rg-item { display: flex; align-items: center; gap: 3px; }
+.rg-dot { width: 5px; height: 5px; border-radius: 50%; }
+.rg-dot.g { background: #1A6B3C; }
+.rg-dot.a { background: #EF9F27; }
+.rg-lbl { font-size: 10px; color: #888; }
+.rg-val { font-size: 10px; font-weight: 600; }
+.rg-val.g { color: #1A6B3C; }
+.rg-val.a { color: #854F0B; }
+
+.m-filters { padding: 5px 12px 8px; display: flex; gap: 5px; border-top: 1px solid #F0F0F0; }
+.f-chip { font-size: 10px; padding: 2px 8px; border-radius: 10px; border: 1px solid #E5E5E5; background: transparent; color: #888; cursor: default; }
+.f-chip.active { background: #D6EDDF; border-color: #9FE1CB; color: #1A6B3C; font-weight: 600; }
+
+.m-input { padding: 8px 12px; border-top: 1px solid #E5E5E5; display: flex; gap: 7px; align-items: center; }
+.q-wrap { flex: 1; border: 1px solid #DDD; border-radius: 8px; padding: 7px 10px; font-size: 12px; color: #999; background: #F9F9F9; }
+.q-send { width: 30px; height: 30px; border-radius: 6px; background: #1A6B3C; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+
+.annotation { position: relative; }
+.ann-list { list-style: none; padding: 0; margin: 16px 0; }
+.ann-list li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F5F5F5; font-size: 12px; color: #444; }
+.ann-list li:last-child { border-bottom: none; }
+.ann-num { width: 20px; height: 20px; border-radius: 4px; background: #0D2137; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.ann-body strong { color: #1A1A1A; display: block; margin-bottom: 2px; font-size: 12px; }
+
+.state-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
+.state-card { border: 1px solid #E5E5E5; border-radius: 8px; padding: 12px; }
+.state-name { font-size: 12px; font-weight: 600; color: #1A1A1A; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.state-dot { width: 7px; height: 7px; border-radius: 50%; }
+.state-card ul { margin: 0; padding-left: 14px; }
+.state-card li { font-size: 11px; color: #555; margin-bottom: 3px; }
+
+.behavior-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.behavior-table th { text-align: left; padding: 7px 10px; font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.04em; background: #F5F5F5; border-bottom: 1px solid #E5E5E5; }
+.behavior-table td { padding: 7px 10px; border-bottom: 1px solid #F5F5F5; font-size: 12px; color: #444; vertical-align: top; }
+.behavior-table td:first-child { font-weight: 500; color: #1A1A1A; white-space: nowrap; }
+.behavior-table tr:last-child td { border-bottom: none; }
+
+.tdd-ref { background: #F0F4F8; border: 1px solid #B5D4F4; border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 12px; color: #185FA5; }
+.tdd-ref strong { color: #0D2137; }
+
+footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid #E5E5E5; text-align: center; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="cover-tag">UI Design Specification</div>
+    <h1>KnowledgeOS<br>Interface Specification</h1>
+    <p class="cover-sub">Reference document for Claude Code — replaces existing UI with production-grade design</p>
+    <div class="cover-meta">
+      <div class="meta-item"><div class="meta-label">Document type</div><div class="meta-value">UI Spec for Claude Code</div></div>
+      <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">2.0 — Full Redesign</div></div>
+      <div class="meta-item"><div class="meta-label">Related TDD</div><div class="meta-value">KnowledgeOS TDD v2.0</div></div>
+      <div class="meta-item"><div class="meta-label">Stack</div><div class="meta-value">React + Tailwind CSS</div></div>
+      <div class="meta-item"><div class="meta-label">Layout</div><div class="meta-value">Two-panel (sidebar + main)</div></div>
+      <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Ready for implementation</div></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: INTENT -->
+  <div class="section">
+    <h2 class="section-title">1. Design Intent</h2>
+    <p class="section-sub">What this UI must communicate to the user at a glance</p>
+
+    <div class="callout">
+      <div class="callout-label">Primary job</div>
+      <p>The user asks a question in natural language and gets a grounded, cited answer. Every visual decision serves this one job. Nothing competes with it.</p>
+    </div>
+
+    <p>This is a professional tool for compliance officers, legal analysts, and enterprise PMs — not a consumer chatbot. The aesthetic should feel like a well-built internal tool: clean, information-dense, trustworthy. Zero decorative chrome.</p>
+
+    <p>The two things that differentiate this UI from a generic chat interface are:</p>
+    <ul>
+      <li><strong>Citation transparency</strong> — every answer surfaces exactly which document chunks were used, with source, page, section, and rerank score. The user should never have to wonder where an answer came from.</li>
+      <li><strong>Pipeline visibility</strong> — the retrieval pipeline (decompose → embed → retrieve → rerank → synthesise) is surfaced as a trace bar on every answer. This is a trust signal, not just a debug tool.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 2: LAYOUT -->
+  <div class="section">
+    <h2 class="section-title">2. Layout Structure</h2>
+    <p class="section-sub">Two-column CSS grid. Fixed sidebar, flexible main panel.</p>
+
+    <div class="layout-diagram">
+      <div class="layout-diagram-header">Full-viewport layout (min-height: 100vh)</div>
+      <div class="layout-grid">
+        <div class="layout-sidebar">
+          <div class="layout-zone" style="height:100%; flex-direction:column; align-items:flex-start; padding:10px;">
+            <span class="zone-tag z-sidebar">Sidebar — 260px fixed</span>
+            <div style="margin-top:8px; font-size:11px; color:#999; line-height:1.8;">
+              ↑ Logo + upload button<br>
+              ↑ "Knowledge base" label<br>
+              ↑ Document list (scrollable)<br>
+              ↓ Corpus stats (4 metrics)
+            </div>
+          </div>
+        </div>
+        <div class="layout-main">
+          <div class="layout-zone"><span class="zone-tag z-toolbar">Toolbar — 48px</span> Title + index status badge + icon buttons</div>
+          <div class="layout-zone" style="flex:1;"><span class="zone-tag z-chat">Chat area — flex:1, overflow-y:auto</span> Message thread + answer cards with citation panels</div>
+          <div class="layout-zone"><span class="zone-tag z-filter">Filter chips — 40px</span> All docs / Policy / Contracts / SOPs / Year</div>
+          <div class="layout-zone"><span class="zone-tag z-input">Query bar — 60px</span> Textarea + attach + history + send button</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Layout CSS skeleton</h3>
+    <pre style="background:#F0F4F8;border-radius:6px;padding:14px;font-size:12px;color:#1A3A5C;font-family:'Courier New',monospace;overflow-x:auto;line-height:1.6;">.app {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}</pre>
+  </div>
+
+  <!-- SECTION 3: ANNOTATED MOCKUP -->
+  <div class="section">
+    <h2 class="section-title">3. Annotated Screen Mockup</h2>
+    <p class="section-sub">Reference mockup with all key elements labelled</p>
+
+    <div class="mockup-frame">
+      <div class="mockup-titlebar">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+        &nbsp;KnowledgeOS — Enterprise Knowledge Base
+      </div>
+      <div class="mockup-body">
+        <div class="sb">
+          <div class="sb-head">
+            <div class="sb-logo"><div class="sb-dot"></div><span class="sb-title">KnowledgeOS</span><span class="sb-ver">v2.0</span></div>
+            <div class="sb-upload">⬆ Upload document</div>
+          </div>
+          <div class="sb-section-label">Knowledge base</div>
+          <div class="sb-docs">
+            <div class="sb-doc active">
+              <div class="sb-doc-icon pdf">P</div>
+              <div class="sb-doc-meta">
+                <div class="sb-doc-name">hipaa-compliance-policy-v4.pdf</div>
+                <div class="sb-doc-info">2.4 MB · Jun 2026</div>
+                <div class="sb-doc-chunk">312 chunks</div>
+              </div>
+            </div>
+            <div class="sb-doc">
+              <div class="sb-doc-icon docx">D</div>
+              <div class="sb-doc-meta">
+                <div class="sb-doc-name">data-handling-sop-2026.docx</div>
+                <div class="sb-doc-info">840 KB · May 2026</div>
+                <div class="sb-doc-chunk">148 chunks</div>
+              </div>
+            </div>
+            <div class="sb-doc">
+              <div class="sb-doc-icon txt">T</div>
+              <div class="sb-doc-meta">
+                <div class="sb-doc-name">incident-response-runbook.txt</div>
+                <div class="sb-doc-info">120 KB · Apr 2026</div>
+                <div class="sb-doc-chunk">64 chunks</div>
+              </div>
+            </div>
+          </div>
+          <div class="sb-stats">
+            <div class="sb-stat"><div class="sb-stat-v">5</div><div class="sb-stat-l">Documents</div></div>
+            <div class="sb-stat"><div class="sb-stat-v">708</div><div class="sb-stat-l">Chunks</div></div>
+            <div class="sb-stat"><div class="sb-stat-v">0.94</div><div class="sb-stat-l">Faithfulness</div></div>
+            <div class="sb-stat"><div class="sb-stat-v">2.1s</div><div class="sb-stat-l">P95 latency</div></div>
+          </div>
+        </div>
+        <div class="main-area">
+          <div class="m-toolbar">
+            <span class="m-toolbar-title">Query knowledge base</span>
+            <span class="m-badge">✓ All docs indexed</span>
+            <span class="m-icon-btn">⏱</span>
+            <span class="m-icon-btn">⚙</span>
+          </div>
+          <div class="m-chat">
+            <div class="user-msg">
+              <div class="user-bubble">What encryption standard is required for patient data at rest?</div>
+            </div>
+            <div class="asst-msg">
+              <div class="asst-av">✦</div>
+              <div class="asst-body">
+                <div class="answer-box">
+                  <div class="ans-text">
+                    Patient data must use <strong>AES-256</strong> encryption at rest <span class="cite-tag">1</span>.
+                    Keys rotate every <strong>90 days</strong> via KMS <span class="cite-tag">1</span>.
+                    The DPO owns rotation auditing <span class="cite-tag">2</span>. Failures escalate as Severity 2 within 4 hours <span class="cite-tag">3</span>.
+                  </div>
+                  <div class="ans-sources">
+                    <div class="src-header"><span>3 sources · top-20 retrieved → reranked to top-3</span><span class="src-valid">✓ Citation validated</span></div>
+                    <div class="src-cards">
+                      <div class="src-card">
+                        <div class="src-card-top"><div class="src-num">1</div><span class="src-name">hipaa-compliance-policy-v4.pdf</span><span class="src-score hi">0.94</span></div>
+                        <div class="src-page">§ 4.2 Encryption Requirements · p.12</div>
+                        <div class="src-excerpt">"All PHI stored in cloud must use AES-256 at rest. Keys rotated every 90 days via KMS..."</div>
+                      </div>
+                      <div class="src-card">
+                        <div class="src-card-top"><div class="src-num">2</div><span class="src-name">data-handling-sop-2026.docx</span><span class="src-score hi">0.87</span></div>
+                        <div class="src-page">§ 2.1 Roles · p.4</div>
+                      </div>
+                      <div class="src-card">
+                        <div class="src-card-top"><div class="src-num">3</div><span class="src-name">incident-response-runbook.txt</span><span class="src-score md">0.71</span></div>
+                        <div class="src-page">§ 5 Key Management Failures</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="pipeline-row">
+                    <span class="p-label">Pipeline</span>
+                    <span class="p-pill">Decomposed</span><span class="p-arrow">›</span>
+                    <span class="p-pill">Embedded</span><span class="p-arrow">›</span>
+                    <span class="p-pill">Hybrid top-20</span><span class="p-arrow">›</span>
+                    <span class="p-pill">Reranked top-3</span><span class="p-arrow">›</span>
+                    <span class="p-pill">Synthesised</span>
+                    <span class="p-ms">2.3s total</span>
+                  </div>
+                  <div class="ragas-row">
+                    <span class="rg-label">RAGAS</span>
+                    <div class="rg-item"><div class="rg-dot g"></div><span class="rg-lbl">Faithfulness</span><span class="rg-val g">0.97</span></div>
+                    <div class="rg-item"><div class="rg-dot g"></div><span class="rg-lbl">Relevance</span><span class="rg-val g">0.91</span></div>
+                    <div class="rg-item"><div class="rg-dot a"></div><span class="rg-lbl">Ctx precision</span><span class="rg-val a">0.78</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="m-filters">
+            <span class="f-chip active">All docs</span>
+            <span class="f-chip">Policy</span>
+            <span class="f-chip">Contracts</span>
+            <span class="f-chip">SOPs</span>
+            <span class="f-chip">2026 only</span>
+          </div>
+          <div class="m-input">
+            <div class="q-wrap">Ask anything about your documents…</div>
+            <div class="q-send">↑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="ann-list">
+      <li><div class="ann-num">A</div><div class="ann-body"><strong>Sidebar — document list</strong> Each doc shows: file type colour-coded icon (PDF=red, DOCX=blue, TXT=green), filename truncated, size + date, chunk count badge. Active doc highlighted with white bg + border.</div></li>
+      <li><div class="ann-num">B</div><div class="ann-body"><strong>Sidebar — corpus stats</strong> Four live metric cards at bottom: Documents, Chunks, Faithfulness score, P95 latency. These come from the observability logger, not hardcoded.</div></li>
+      <li><div class="ann-num">C</div><div class="ann-body"><strong>Toolbar badge</strong> "All docs indexed" (green) / "Indexing…" (amber spinner) / "X errors" (red) — driven by ingestion pipeline state.</div></li>
+      <li><div class="ann-num">D</div><div class="ann-body"><strong>User message bubble</strong> Right-aligned, primary green background (#1A6B3C), white text, 10px 10px 3px 10px border-radius.</div></li>
+      <li><div class="ann-num">E</div><div class="ann-body"><strong>Answer text</strong> Inline citation markers <code>[1]</code> <code>[2]</code> <code>[3]</code> styled as blue pills. Clickable — scroll to corresponding source card below.</div></li>
+      <li><div class="ann-num">F</div><div class="ann-body"><strong>Citation panel header</strong> Shows "N sources · top-20 retrieved → reranked to top-N" + citation validation badge (green shield check).</div></li>
+      <li><div class="ann-num">G</div><div class="ann-body"><strong>Source cards</strong> Each card: chunk number badge (dark blue), filename, rerank score badge (green ≥ 0.80 / amber &lt; 0.80), section + page, excerpt text. Click to expand full chunk.</div></li>
+      <li><div class="ann-num">H</div><div class="ann-body"><strong>Pipeline trace bar</strong> Five green pills showing each stage completed. Total ms right-aligned. This is the most important trust signal — do not omit.</div></li>
+      <li><div class="ann-num">I</div><div class="ann-body"><strong>RAGAS bar</strong> Three live scores per answer: Faithfulness, Answer Relevance, Context Precision. Green ≥ target threshold, amber below. Only shown when scores are available (sampled, not every query).</div></li>
+      <li><div class="ann-num">J</div><div class="ann-body"><strong>Filter chips</strong> Horizontal pill row. Active chip: green fill. Filters map to Pinecone metadata filter on <code>docType</code> and <code>uploadedAt</code>.</div></li>
+      <li><div class="ann-num">K</div><div class="ann-body"><strong>Query bar</strong> Auto-growing textarea (max 3 lines). Paperclip for file attach. Clock for query history. Green send button. Enter to submit, Shift+Enter for new line.</div></li>
+    </ul>
+  </div>
+
+  <!-- SECTION 4: COMPONENT SPEC -->
+  <div class="section">
+    <h2 class="section-title">4. Component Specifications</h2>
+    <p class="section-sub">Implementation details for each component Claude Code needs to build or replace</p>
+
+    <div class="component-grid">
+      <div class="component-card">
+        <div class="component-name">DocumentSidebar <span class="component-badge badge-required">Required</span></div>
+        <ul>
+          <li>Props: <code>documents[]</code>, <code>activeDocId</code>, <code>onUpload</code>, <code>onSelectDoc</code>, <code>corpusStats</code></li>
+          <li>Document list item: icon, name (ellipsis), size+date, chunk count badge</li>
+          <li>Active state: white bg + 0.5px border</li>
+          <li>Stats grid: 2×2, live from props</li>
+          <li>Upload button: dashed border, hover fills white</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">AnswerCard <span class="component-badge badge-required">Required</span></div>
+        <ul>
+          <li>Props: <code>answer</code>, <code>citations[]</code>, <code>pipelineTrace</code>, <code>ragasScores</code></li>
+          <li>Answer text with inline <code>CitationPill</code> components</li>
+          <li>CitationPanel below answer text</li>
+          <li>PipelineTrace bar below citations</li>
+          <li>RAGASBar at bottom (conditional on scores)</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">CitationPanel <span class="component-badge badge-required">Required</span></div>
+        <ul>
+          <li>Props: <code>chunks[]</code>, <code>validationStatus</code></li>
+          <li>Header: source count + rerank info + validation badge</li>
+          <li>SourceCard per chunk: num, filename, score, section/page, excerpt</li>
+          <li>Click to expand full chunk text</li>
+          <li>Score badge: green if ≥ 0.80, amber if &lt; 0.80</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">PipelineTrace <span class="component-badge badge-required">Required</span></div>
+        <ul>
+          <li>Props: <code>stages[]</code>, <code>totalMs</code></li>
+          <li>Stages: Decomposed, Embedded, Hybrid top-20, Reranked top-N, Synthesised</li>
+          <li>Each stage: small green pill when done, gray when pending</li>
+          <li>Total latency right-aligned</li>
+          <li>Do not omit — critical trust signal</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">QueryBar <span class="component-badge badge-required">Required</span></div>
+        <ul>
+          <li>Props: <code>onSubmit</code>, <code>disabled</code>, <code>filterState</code></li>
+          <li>Auto-growing textarea, max 3 rows</li>
+          <li>Enter submits, Shift+Enter newline</li>
+          <li>Paperclip (attach), clock (history) icon buttons inside input</li>
+          <li>Send button: green, arrow-up icon</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">FilterChips <span class="component-badge badge-optional">Optional v1</span></div>
+        <ul>
+          <li>Props: <code>filters[]</code>, <code>active</code>, <code>onChange</code></li>
+          <li>Chips: All docs, Policy, Contracts, SOPs, 2026 only</li>
+          <li>Maps to Pinecone <code>docType</code> + <code>uploadedAt</code> metadata filter</li>
+          <li>Active: green fill + border</li>
+          <li>Can be added after core Q&A works</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">RAGASBar <span class="component-badge badge-optional">Optional v1</span></div>
+        <ul>
+          <li>Props: <code>faithfulness</code>, <code>relevance</code>, <code>ctxPrecision</code></li>
+          <li>Only renders when scores are present</li>
+          <li>Green dot + value if ≥ threshold, amber if below</li>
+          <li>Thresholds: faithfulness 0.95, relevance 0.85, precision 0.80</li>
+        </ul>
+      </div>
+      <div class="component-card">
+        <div class="component-name">EmptyState <span class="component-badge badge-required">Required</span></div>
+        <ul>
+          <li>Shown when no messages yet</li>
+          <li>Large muted icon, heading, subtext</li>
+          <li>3 suggestion query buttons below</li>
+          <li>Suggestions: "What does our data retention policy say?", "Who approves access to PHI?", "Summarise the vendor contract obligations."</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: COLOUR -->
+  <div class="section">
+    <h2 class="section-title">5. Colour & Typography</h2>
+
+    <h3>Primary palette</h3>
+    <div class="color-grid">
+      <div class="color-swatch"><div class="swatch-fill" style="background:#1A6B3C;"></div><div class="swatch-meta"><div class="swatch-name">Brand Green</div><div class="swatch-use">#1A6B3C · send btn, active doc, user bubble</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#D6EDDF;"></div><div class="swatch-meta"><div class="swatch-name">Green Light</div><div class="swatch-use">#D6EDDF · active chips, chunk badges, valid badge</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#0D2137;"></div><div class="swatch-meta"><div class="swatch-name">Navy</div><div class="swatch-use">#0D2137 · headings, logo, section titles</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#185FA5;"></div><div class="swatch-meta"><div class="swatch-name">Blue</div><div class="swatch-use">#185FA5 · citation pills, DOCX icon, chunk num badge</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#E6F1FB;"></div><div class="swatch-meta"><div class="swatch-name">Blue Light</div><div class="swatch-use">#E6F1FB · citation pill bg</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#EF9F27;"></div><div class="swatch-meta"><div class="swatch-name">Amber</div><div class="swatch-use">#EF9F27 · amber RAGAS dots, low score indicator</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#FDEAEA;"></div><div class="swatch-meta"><div class="swatch-name">Red Light</div><div class="swatch-use">#FDEAEA · PDF icon bg, error states</div></div></div>
+      <div class="color-swatch"><div class="swatch-fill" style="background:#F9F9F9;"></div><div class="swatch-meta"><div class="swatch-name">Surface</div><div class="swatch-use">#F9F9F9 · sidebar bg, citation panel bg, source card area</div></div></div>
+    </div>
+
+    <h3>Typography scale</h3>
+    <table class="spec-table">
+      <tr><th>Element</th><th>Size</th><th>Weight</th><th>Color</th></tr>
+      <tr><td>Logo / App name</td><td>15px</td><td>600</td><td>#0D2137</td></tr>
+      <tr><td>Section labels (sidebar)</td><td>11px uppercase</td><td>600</td><td>#999</td></tr>
+      <tr><td>Doc name in sidebar</td><td>13px</td><td>500</td><td>#1A1A1A</td></tr>
+      <tr><td>Doc metadata</td><td>11px</td><td>400</td><td>#999</td></tr>
+      <tr><td>Toolbar title</td><td>14px</td><td>600</td><td>#1A1A1A</td></tr>
+      <tr><td>Answer text</td><td>13px</td><td>400</td><td>#1A1A1A</td></tr>
+      <tr><td>Citation source name</td><td>12px</td><td>500</td><td>#1A1A1A</td></tr>
+      <tr><td>Citation excerpt</td><td>12px</td><td>400</td><td>#666</td></tr>
+      <tr><td>Pipeline stage pills</td><td>11px</td><td>500</td><td>#0F6E56</td></tr>
+      <tr><td>RAGAS labels/values</td><td>10–11px</td><td>400/600</td><td>#888 / #1A6B3C</td></tr>
+      <tr><td>Filter chips</td><td>11px</td><td>400/600</td><td>#888 / #1A6B3C active</td></tr>
+      <tr><td>Query input placeholder</td><td>13px</td><td>400</td><td>#999</td></tr>
+      <tr><td>Stat card value</td><td>15px</td><td>600</td><td>#1A1A1A</td></tr>
+      <tr><td>Stat card label</td><td>9–10px</td><td>400</td><td>#999</td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 6: STATES -->
+  <div class="section">
+    <h2 class="section-title">6. UI States</h2>
+
+    <div class="state-grid">
+      <div class="state-card">
+        <div class="state-name"><div class="state-dot" style="background:#1A6B3C;"></div>Empty / No messages</div>
+        <ul>
+          <li>EmptyState component fills chat area</li>
+          <li>Muted icon (book or sparkles)</li>
+          <li>3 suggestion query buttons</li>
+          <li>Filter chips still visible</li>
+        </ul>
+      </div>
+      <div class="state-card">
+        <div class="state-name"><div class="state-dot" style="background:#EF9F27;"></div>Query loading</div>
+        <ul>
+          <li>User bubble appended immediately</li>
+          <li>Assistant row with spinning loader</li>
+          <li>"Retrieving and re-ranking…" text</li>
+          <li>Send button disabled</li>
+          <li>Input disabled during generation</li>
+        </ul>
+      </div>
+      <div class="state-card">
+        <div class="state-name"><div class="state-dot" style="background:#185FA5;"></div>Streaming answer</div>
+        <ul>
+          <li>Answer text streams token by token</li>
+          <li>Citation panel appears after stream ends</li>
+          <li>Pipeline trace renders after stream ends</li>
+          <li>Blinking cursor at stream end</li>
+        </ul>
+      </div>
+      <div class="state-card">
+        <div class="state-name"><div class="state-dot" style="background:#A32D2D;"></div>Insufficient context</div>
+        <ul>
+          <li>Amber-bordered answer card</li>
+          <li>Text: "I cannot find sufficient information…"</li>
+          <li>No citation panel shown</li>
+          <li>Pipeline trace still shown</li>
+          <li>Suggestion to refine query</li>
+        </ul>
+      </div>
+      <div class="state-card">
+        <div class="state-name"><div class="state-dot" style="background:#EF9F27;"></div>Document uploading</div>
+        <ul>
+          <li>Upload button replaced by progress bar</li>
+          <li>Toolbar badge → "Indexing… (N chunks)"</li>
+          <li>Doc appears in list with spinner</li>
+          <li>Chunk count fills in when done</li>
+        </ul>
+      </div>
+      <div class="state-card">
+        <div class="state-name"><div class="state-dot" style="background:#A32D2D;"></div>API error</div>
+        <ul>
+          <li>Red-bordered answer card</li>
+          <li>Error message + error code</li>
+          <li>Retry button in card</li>
+          <li>Rate limit shown distinctly</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: BEHAVIOUR -->
+  <div class="section">
+    <h2 class="section-title">7. Interaction Behaviour</h2>
+
+    <table class="behavior-table">
+      <tr><th>Trigger</th><th>Behaviour</th></tr>
+      <tr><td>Enter in query input</td><td>Submit query. Shift+Enter inserts newline.</td></tr>
+      <tr><td>Click citation pill [1]</td><td>Scroll citation panel into view, highlight corresponding source card with blue border for 1.5s.</td></tr>
+      <tr><td>Click source card</td><td>Expand to show full chunk text. Click again to collapse.</td></tr>
+      <tr><td>Click document in sidebar</td><td>Set as active doc, apply as implicit filter (or show visual indicator — do not hard-filter without user confirming).</td></tr>
+      <tr><td>Click upload button</td><td>Open native file picker. Accept: .pdf, .docx, .txt. On select, show ingestion progress inline.</td></tr>
+      <tr><td>Click filter chip</td><td>Apply metadata filter to all subsequent queries. Active chip turns green. "All docs" chip deselects others.</td></tr>
+      <tr><td>Click history icon</td><td>Show last 50 queries in a right-side slide-in panel (or dropdown). Click a past query to re-run it.</td></tr>
+      <tr><td>Hover source card score badge</td><td>Tooltip: "Cohere Rerank v3 relevance score. ≥ 0.80 is high confidence."</td></tr>
+      <tr><td>New answer received</td><td>Smooth scroll chat area to bottom.</td></tr>
+      <tr><td>Delete document (right-click or icon)</td><td>Confirmation dialog: "Remove [filename] and all its chunks?" Yes/Cancel.</td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 8: TDD CROSS-REFS -->
+  <div class="section">
+    <h2 class="section-title">8. TDD Cross-References</h2>
+    <p class="section-sub">Every UI element maps to a backend specification. Claude Code should wire these up, not hardcode them.</p>
+
+    <div class="tdd-ref"><strong>Citation panel header text</strong> — "top-20 retrieved → reranked to top-N" — N comes from <code>pipelineTrace.rerankTopN</code>. See TDD §5a.</div>
+    <div class="tdd-ref"><strong>Rerank score badges</strong> — scores come from Cohere Rerank v3 response. See TDD §5b. Green threshold = 0.80.</div>
+    <div class="tdd-ref"><strong>Citation validation badge</strong> — <code>validationStatus: 'clean' | 'uncited_claims' | 'rerun'</code> from API response. Show green shield on 'clean', amber warning on 'uncited_claims'. See TDD §6c.</div>
+    <div class="tdd-ref"><strong>Pipeline trace stages</strong> — driven by <code>pipelineTrace.stages[]</code> in API response. Each stage has <code>name</code> and <code>durationMs</code>. See TDD §3 data flow.</div>
+    <div class="tdd-ref"><strong>RAGAS scores</strong> — from <code>ragasOnline</code> field in API response. May be <code>null</code> if query was not sampled. Hide RAGASBar when null. See TDD §4.</div>
+    <div class="tdd-ref"><strong>Corpus stats</strong> — documents count, chunks count from vector store metadata. Faithfulness + latency from observability logger rolling average. See TDD §6.</div>
+    <div class="tdd-ref"><strong>Filter chips</strong> — map to Pinecone <code>filter</code> param: Policy → <code>{docType: 'policy'}</code>, Contracts → <code>{docType: 'contract'}</code>, 2026 only → <code>{uploadedAt: {$gte: '2026-01-01'}}</code>. See TDD §5a.</div>
+    <div class="tdd-ref"><strong>Insufficient context response</strong> — detected when answer starts with <code>INSUFFICIENT_CONTEXT:</code> prefix from synthesiser. Render amber card variant. See TDD §6b rule 2.</div>
+  </div>
+
+  <!-- SECTION 9: WHAT NOT TO DO -->
+  <div class="section">
+    <h2 class="section-title">9. What Not to Do</h2>
+
+    <div class="callout amber">
+      <div class="callout-label">Do not carry over from existing UI</div>
+      <p>The current UI is being replaced entirely. Do not preserve any existing layout, colour scheme, component structure, or interaction patterns unless they happen to match this spec. Start fresh from this document.</p>
+    </div>
+
+    <ul style="margin-top:12px;">
+      <li><strong>No generic chat bubble UI</strong> — this is not a chatbot. The answer card with citation panel is the core unit, not a plain text bubble.</li>
+      <li><strong>No fabricated citation data</strong> — citation scores, filenames, page numbers must come from the API response. Never hardcode or mock them in the final build.</li>
+      <li><strong>No omitting the pipeline trace bar</strong> — this is a differentiator, not a debug feature. It must appear on every successful answer.</li>
+      <li><strong>No removing the RAGAS bar</strong> — render it conditionally (when scores are present), but do not delete the component.</li>
+      <li><strong>No full-page loading spinners</strong> — loading states are localised to the assistant message row. The sidebar and filter chips remain interactive during query processing.</li>
+      <li><strong>No hardcoded document list</strong> — the sidebar must be driven by the actual indexed document state from the vector store.</li>
+    </ul>
+  </div>
+
+  <footer>
+    KnowledgeOS UI Spec v2.0 · For Claude Code implementation · Paired with TDD v2.0
+  </footer>
+
+</div>
+</body>
+</html>
