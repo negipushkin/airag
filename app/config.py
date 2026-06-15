@@ -37,8 +37,8 @@ class Settings(BaseSettings):
 
     # Retrieval (TDD Stage 5)
     retrieval_alpha: float = 0.7      # 0 = pure sparse, 1 = pure dense
-    top_k_candidates: int = 40
-    top_k_final: int = 20
+    top_k_candidates: int = 100
+    top_k_final: int = 100
     rrf_k: int = 60
     min_rerank_score: float = 0.15    # below this -> INSUFFICIENT_CONTEXT
 
@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     hyde_query_weight: float = 0.7    # fused = w*query + (1-w)*hyde
 
     # Synthesis (TDD Stage 6)
-    max_chunk_chars_in_context: int = 2000  # prompt-injection mitigation 7.2
+    max_chunk_chars_in_context: int = 4000  # prompt-injection mitigation 7.2
 
     # Storage
     data_dir: Path = Path("data")
