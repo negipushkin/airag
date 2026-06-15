@@ -98,7 +98,8 @@ class PineconeDocumentRegistry:
 
     def list(self) -> list[DocumentInfo]:
         try:
-            ids = list(self._index.list(namespace=self._NAMESPACE))
+            # index.list() is a paginated generator — flatten all batches
+            ids = [id for batch in self._index.list(namespace=self._NAMESPACE) for id in batch]
             if not ids:
                 return []
             fetched = self._index.fetch(ids=ids, namespace=self._NAMESPACE)
