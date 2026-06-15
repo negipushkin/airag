@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, Security, UploadFile
 from fastapi.security import APIKeyHeader
 
@@ -36,8 +38,12 @@ async def ingest(file: UploadFile, doc_type: str = "document") -> IngestResponse
         raise HTTPException(status_code=413, detail="File exceeds 50 MB limit")
     if not data:
         raise HTTPException(status_code=400, detail="Empty file")
+    loop = asyncio.get_event_loop()
     try:
-        info = get_pipeline().ingest(data, file.filename or "upload", doc_type=doc_type)
+        info = await loop.run_in_executor(
+            None,
+            lambda: get_pipeline().ingest(data, file.filename or "upload", doc_type=doc_type),
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
@@ -46,10 +52,14 @@ async def ingest(file: UploadFile, doc_type: str = "document") -> IngestResponse
 
 
 @router.post("/query", response_model=QueryResponse)
-def query(req: QueryRequest) -> QueryResponse:
+async def query(req: QueryRequest) -> QueryResponse:
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query must not be empty")
-    return get_pipeline().query(req)
+    loop = asyncio.get_event_loop()
+    try:
+        return await loop.run_in_executor(None, lambda: get_pipeline().query(req))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
 
 
 @router.get("/documents", response_model=list[DocumentInfo])
