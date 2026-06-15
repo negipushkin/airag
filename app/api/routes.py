@@ -79,15 +79,19 @@ health_router = APIRouter()
 
 @health_router.get("/api/test-openai")
 def test_openai() -> dict:
-    import httpx
-    from openai import OpenAI
+    import requests as req
     from app.config import get_settings
     s = get_settings()
     try:
-        client = OpenAI(api_key=s.openai_api_key, max_retries=0, timeout=6.0,
-                        http_client=httpx.Client(http2=False))
-        resp = client.embeddings.create(model="text-embedding-3-small", input=["test"], dimensions=8)
-        return {"status": "ok", "dims": len(resp.data[0].embedding)}
+        resp = req.post(
+            "https://api.openai.com/v1/embeddings",
+            headers={"Authorization": f"Bearer {s.openai_api_key}"},
+            json={"model": "text-embedding-3-small", "input": ["test"], "dimensions": 8},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return {"status": "ok", "dims": len(data["data"][0]["embedding"])}
     except Exception as exc:
         return {"status": "error", "type": type(exc).__name__, "detail": str(exc)}
 
