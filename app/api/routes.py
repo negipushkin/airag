@@ -41,7 +41,7 @@ async def ingest(file: UploadFile, doc_type: str = "document") -> IngestResponse
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
     return IngestResponse(document=info)
 
 
