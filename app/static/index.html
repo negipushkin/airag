@@ -116,14 +116,15 @@ input[type=file]{ display:none; }
   display: flex; align-items: center; gap: 8px;
   flex-shrink: 0; background: var(--bg);
 }
-.toolbar-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
+.toolbar-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .toolbar-badge {
   font-size: 12px; padding: 2px 9px; border-radius: 10px;
-  font-weight: 600; display: inline-flex; align-items: center; gap: 4px;
+  font-weight: 600; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
 }
 .badge-ok    { background: var(--green-l); color: var(--green); }
 .badge-spin  { background: var(--amber-l); color: #854F0B; }
 .badge-err   { background: var(--red-l);   color: var(--red); }
+.badge-doc   { background: var(--blue-l);  color: var(--blue); }
 .tb-btn { width: 26px; height: 26px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: border-color .12s, color .12s; }
 .tb-btn:hover { border-color: var(--border-hi); color: var(--text); }
 
@@ -328,7 +329,7 @@ input[type=file]{ display:none; }
 
   <!-- Toolbar -->
   <div class="toolbar">
-    <span class="toolbar-title">Query knowledge base</span>
+    <span class="toolbar-title" id="toolbarTitle">Query knowledge base</span>
     <span class="toolbar-badge badge-ok" id="toolbarBadge">✓ All docs indexed</span>
     <button class="tb-btn" id="histBtn" data-tip="Query history" onclick="toggleHistory()">⏱</button>
     <button class="tb-btn" data-tip="Settings (coming soon)">⚙</button>
@@ -346,9 +347,9 @@ input[type=file]{ display:none; }
   <div class="chat-area" id="chatArea">
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">📚</div>
-      <h2>Ask your knowledge base</h2>
-      <p>Upload documents using the sidebar, then ask any question. Every answer is grounded in your sources with full citation transparency.</p>
-      <div class="suggestions">
+      <h2 id="emptyTitle">Ask your knowledge base</h2>
+      <p id="emptyDesc">Upload a document using the sidebar, then ask any question. Every answer is grounded in your sources with full citation transparency.</p>
+      <div class="suggestions" id="emptySuggestions">
         <button class="sug" onclick="runSuggestion(this)">What does our data retention policy say?</button>
         <button class="sug" onclick="runSuggestion(this)">Who approves access to PHI?</button>
         <button class="sug" onclick="runSuggestion(this)">Summarise the vendor contract obligations.</button>
@@ -383,11 +384,12 @@ input[type=file]{ display:none; }
 
 <script>
 const BASE = '';
-let activeFilter = '';
-let queryCount  = 0;
-let totalMs     = 0;
-let historyList = [];
-let busy        = false;
+let activeFilter  = '';
+let selectedDocId = null;   // null = all docs
+let queryCount    = 0;
+let totalMs       = 0;
+let historyList   = [];
+let busy          = false;
 
 // ── textarea auto-grow ──
 function grow(el) {
@@ -495,7 +497,6 @@ async function loadDocs() {
   try {
     const docs = await fetch(`${BASE}/api/documents`).then(r => r.json());
     const el = document.getElementById('docList');
-    const empty = document.getElementById('docEmpty');
 
     if (!docs.length) {
       el.innerHTML = '<div class="doc-empty" id="docEmpty">No documents indexed yet</div>';
@@ -507,7 +508,7 @@ async function loadDocs() {
     }
 
     el.innerHTML = docs.map(d => `
-      <div class="doc-row" id="dr-${d.id}" onclick="selectDoc('${d.id}')">
+      <div class="doc-row" id="dr-${d.id}" onclick="selectDoc('${d.id}','${escHtml(d.filename)}')">
         <div class="doc-icon ${fileType(d.filename)}">${fileType(d.filename).toUpperCase().slice(0,1)}</div>
         <div class="doc-meta">
           <div class="doc-name" title="${escHtml(d.filename)}">${escHtml(d.filename)}</div>
@@ -522,12 +523,35 @@ async function loadDocs() {
     document.getElementById('statChunks').textContent = totalChunks > 999 ? (totalChunks/1000).toFixed(1)+'k' : totalChunks;
     document.getElementById('toolbarBadge').className = 'toolbar-badge badge-ok';
     document.getElementById('toolbarBadge').textContent = `✓ ${docs.length} doc${docs.length>1?'s':''} indexed`;
+
+    // Update empty state: docs are ready, no upload needed
+    const title = document.getElementById('emptyTitle');
+    const desc  = document.getElementById('emptyDesc');
+    if (title) title.textContent = `${docs.length} document${docs.length>1?'s':''} ready`;
+    if (desc)  desc.textContent  = 'Click a document in the sidebar to query it, or ask across your entire knowledge base.';
   } catch(e) { console.error('loadDocs', e); }
 }
 
-function selectDoc(id) {
+function selectDoc(id, filename) {
+  if (selectedDocId === id) {
+    // Deselect: go back to all-docs mode
+    selectedDocId = null;
+    document.querySelectorAll('.doc-row').forEach(r => r.classList.remove('active'));
+    document.getElementById('toolbarTitle').textContent = 'Query knowledge base';
+    document.getElementById('toolbarBadge').className  = 'toolbar-badge badge-ok';
+    document.getElementById('toolbarBadge').textContent = '✓ All docs';
+    document.getElementById('qinput').placeholder = 'Ask anything about your documents…';
+    return;
+  }
+  selectedDocId = id;
   document.querySelectorAll('.doc-row').forEach(r => r.classList.remove('active'));
   document.getElementById('dr-'+id)?.classList.add('active');
+  // Update toolbar to show which doc is scoped
+  document.getElementById('toolbarTitle').textContent = filename;
+  document.getElementById('toolbarBadge').className  = 'toolbar-badge badge-doc';
+  document.getElementById('toolbarBadge').textContent = '⊙ Single doc';
+  document.getElementById('qinput').placeholder = `Ask about ${filename}…`;
+  document.getElementById('qinput').focus();
 }
 
 async function delDoc(e, id) {
@@ -577,7 +601,8 @@ async function ask() {
 
   try {
     const body = { query: q };
-    if (activeFilter) body.doc_type = activeFilter;
+    if (selectedDocId) body.doc_id = selectedDocId;
+    else if (activeFilter) body.doc_type = activeFilter;
     const r = await fetch(`${BASE}/api/query`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)

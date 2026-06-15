@@ -102,7 +102,12 @@ class Pipeline:
                 trace.hyde_applied = True
 
         # --- Stage 5: hybrid retrieval + re-ranking
-        metadata_filter = {"docType": {"$eq": req.doc_type}} if req.doc_type else None
+        if req.doc_id:
+            metadata_filter = {"docId": {"$eq": req.doc_id}}
+        elif req.doc_type:
+            metadata_filter = {"docType": {"$eq": req.doc_type}}
+        else:
+            metadata_filter = None
         t_ret = time.perf_counter()
         candidates = self.retriever.retrieve(
             sub_queries, metadata_filter=metadata_filter, dense_override=dense_override

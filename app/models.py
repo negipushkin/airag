@@ -91,6 +91,7 @@ class QueryRequest(BaseModel):
     query: str
     conversation_history: list[dict[str, str]] = Field(default_factory=list)
     doc_type: str | None = None      # optional metadata filter
+    doc_id: str | None = None        # optional single-document filter
     top_k: int | None = None
 
 
