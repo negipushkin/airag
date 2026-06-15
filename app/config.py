@@ -37,8 +37,8 @@ class Settings(BaseSettings):
 
     # Retrieval (TDD Stage 5)
     retrieval_alpha: float = 0.7      # 0 = pure sparse, 1 = pure dense
-    top_k_candidates: int = 20
-    top_k_final: int = 5
+    top_k_candidates: int = 40
+    top_k_final: int = 20
     rrf_k: int = 60
     min_rerank_score: float = 0.15    # below this -> INSUFFICIENT_CONTEXT
 
