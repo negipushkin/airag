@@ -67,6 +67,30 @@ def list_documents() -> list[DocumentInfo]:
     return get_pipeline().registry.list()
 
 
+@router.get("/debug-registry")
+def debug_registry() -> dict:
+    """Temporary: diagnose registry list issues."""
+    import os
+    reg = get_pipeline().registry
+    try:
+        result = reg._index.query(
+            vector=reg._zero_dense(),
+            sparse_vector=reg._DUMMY_SPARSE,
+            top_k=100,
+            namespace=reg._NAMESPACE,
+            include_metadata=True,
+        )
+        matches = result.get("matches", [])
+        return {
+            "namespace": reg._NAMESPACE,
+            "match_count": len(matches),
+            "matches": [{"id": m["id"], "metadata": m.get("metadata")} for m in matches],
+            "vercel": bool(os.getenv("VERCEL")),
+        }
+    except Exception as exc:
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
+
 @router.delete("/documents/{doc_id}", status_code=204)
 def delete_document(doc_id: str) -> None:
     if not get_pipeline().delete_document(doc_id):

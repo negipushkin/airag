@@ -98,14 +98,18 @@ class PineconeDocumentRegistry:
 
     def list(self) -> list[DocumentInfo]:
         try:
-            # index.list() is a paginated generator — flatten all batches
-            ids = [id for batch in self._index.list(namespace=self._NAMESPACE) for id in batch]
-            if not ids:
-                return []
-            fetched = self._index.fetch(ids=ids, namespace=self._NAMESPACE)
+            # Query with the registry dummy vector — returns all registry entries
+            # without relying on the paginated index.list() API.
+            result = self._index.query(
+                vector=self._zero_dense(),
+                sparse_vector=self._DUMMY_SPARSE,
+                top_k=1000,
+                namespace=self._NAMESPACE,
+                include_metadata=True,
+            )
             return [
-                self._to_info(vid, v.metadata)
-                for vid, v in fetched.vectors.items()
+                self._to_info(m["id"], m.get("metadata") or {})
+                for m in result.get("matches", [])
             ]
         except Exception:
             return []
