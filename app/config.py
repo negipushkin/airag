@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
     sparse_model: str = "pinecone-sparse-english-v0"
-    transform_model: str = "gpt-4o-mini"   # Stage 4: decomposition / HyDE / rewrite
-    synthesis_model: str = "gpt-4o"        # Stage 6: grounded answer synthesis
+    transform_model: str = "gpt-4.1-mini"  # Stage 4: decomposition / HyDE / rewrite
+    synthesis_model: str = "gpt-4.1"      # Stage 6: grounded answer synthesis
     cohere_rerank_model: str = "rerank-english-v3.0"
     local_cross_encoder: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
