@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import httpx
 from openai import OpenAI
 
 from app.config import get_settings
@@ -12,7 +13,12 @@ _BATCH_SIZE = 96
 class EmbeddingService:
     def __init__(self) -> None:
         s = get_settings()
-        self._client = OpenAI(api_key=s.openai_api_key, max_retries=0, timeout=6.0)
+        self._client = OpenAI(
+            api_key=s.openai_api_key,
+            max_retries=0,
+            timeout=6.0,
+            http_client=httpx.Client(http2=False),
+        )
         self._model = s.embedding_model
         self._dimensions = s.embedding_dimensions
 

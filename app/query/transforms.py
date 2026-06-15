@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import re
 
+import httpx
 from openai import OpenAI
 
 from app.config import get_settings
@@ -36,7 +37,12 @@ class QueryTransformer:
     def __init__(self, client: OpenAI | None = None) -> None:
         s = get_settings()
         self._settings = s
-        self._client = client or OpenAI(api_key=s.openai_api_key, max_retries=1, timeout=8.0)
+        self._client = client or OpenAI(
+            api_key=s.openai_api_key,
+            max_retries=1,
+            timeout=8.0,
+            http_client=httpx.Client(http2=False),
+        )
         self._model = s.transform_model
 
     # ------------------------------------------------------- 4a decomposition
